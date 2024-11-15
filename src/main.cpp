@@ -1,7 +1,10 @@
 #include <Arduino.h>
 #include "GoToSleepTask.h"
+#include "Led.h"
 #include <EnableInterrupt.h>
 
+Led ledRED(4);  
+Led ledGREEN(7);
 enum State {
   AVAILABLE,
   WAITING_FOR_OPEN
