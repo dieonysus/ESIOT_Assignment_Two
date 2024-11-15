@@ -1,24 +1,40 @@
 #include <Arduino.h>
+#include "GoToSleepTask.h"
+#include <EnableInterrupt.h>
 
-// put function declarations here:
-int myFunction(int, int);
+enum State {
+  AVAILABLE,
+  WAITING_FOR_OPEN
+};
+
+State currentState = AVAILABLE;
+
+unsigned long timeBeforeSleep = 5000;
+unsigned long lastActivityTime = millis();
+
+GoToSleepTask goToSleepTask;
+
+int pirPin = 2;
+
+
+void wakeUp(){}
 
 void setup() {
   Serial.begin(9600);
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
-  pinMode(13, OUTPUT);
+  pinMode(pirPin, INPUT_PULLUP); // read about floating pin!
+  enableInterrupt(pirPin, wakeUp, RISING);
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  digitalWrite(13, HIGH);
+  Serial.print("a");
   delay(2000);
-  digitalWrite(13, LOW);
-  delay(2000);
+  switch(currentState) {
+    case AVAILABLE:
+    if (millis() - lastActivityTime > timeBeforeSleep) {
+      goToSleepTask.tick();
+      lastActivityTime = millis();
+    }
+  }
 }
 
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
-}
+
