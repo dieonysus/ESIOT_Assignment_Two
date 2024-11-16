@@ -1,6 +1,11 @@
 #include <Arduino.h>
 #include "GoToSleepTask.h"
+#include "DoorControl.h"
 #include <EnableInterrupt.h>
+
+#define ServoPin 9
+#define OpenBtnPin 3
+#define CloseBtnPin 4
 
 enum State {
   AVAILABLE,
@@ -14,6 +19,8 @@ unsigned long lastActivityTime = millis();
 
 GoToSleepTask goToSleepTask;
 
+DoorControl doorControl(ServoPin,OpenBtnPin,CloseBtnPin);
+
 int pirPin = 2;
 
 
@@ -23,6 +30,7 @@ void setup() {
   Serial.begin(9600);
   pinMode(pirPin, INPUT_PULLUP); // read about floating pin!
   enableInterrupt(pirPin, wakeUp, RISING);
+  doorControl.init();
 }
 
 void loop() {
@@ -35,6 +43,8 @@ void loop() {
       lastActivityTime = millis();
     }
   }
+
+  doorControl.tick();
 }
 
 
