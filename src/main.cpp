@@ -6,19 +6,27 @@
 Led ledRED(4);  
 Led ledGREEN(7);
 enum State {
-  AVAILABLE,
-  WAITING_FOR_OPEN
+    IDLE,
+    SLEEPING,
+    WAITING_FOR_WASTE,
+    PROCESSING_WASTE,
+    CONTAINER_FULL,
+    EMPTYING_PROCESS,
+    RESTORE,
+    TEMPERATURE_PROBLEM
 };
 
-State currentState = AVAILABLE;
+State currentState = IDLE;
 
 unsigned long timeBeforeSleep = 5000;
 unsigned long lastActivityTime = millis();
+unsigned long timeToEnterWaste = 10000;
+
 
 GoToSleepTask goToSleepTask;
 
 int pirPin = 2;
-
+int buttonPin = 8;
 
 void wakeUp(){}
 
@@ -26,18 +34,51 @@ void setup() {
   Serial.begin(9600);
   pinMode(pirPin, INPUT_PULLUP); // read about floating pin!
   enableInterrupt(pirPin, wakeUp, RISING);
+  pinMode(buttonPin, INPUT);
 }
 
 void loop() {
-  Serial.print("a");
-  delay(2000);
   switch(currentState) {
-    case AVAILABLE:
-    if (millis() - lastActivityTime > timeBeforeSleep) {
-      goToSleepTask.tick();
-      lastActivityTime = millis();
-    }
+
+    case IDLE:
+      // green led is on
+      if (millis() - lastActivityTime > timeBeforeSleep) {
+        goToSleepTask.tick();
+        lastActivityTime = millis();
+      } 
+      else if (digitalRead(buttonPin) == HIGH) { //debounce
+        Serial.print(" BUTTON ");
+        currentState = WAITING_FOR_WASTE;
+        lastActivityTime = millis();
+      }
+      break;
+
+    case WAITING_FOR_WASTE:
+    // open door
+      Serial.print(" PRESS CLOSE WHEN DONE ");
+      delay(500);
+      if (millis() - lastActivityTime > timeToEnterWaste) {
+        Serial.print(" TIMEOUT ");
+        delay(1000);
+        currentState = IDLE;
+        lastActivityTime = millis();
+      }
+      else if (digitalRead(buttonPin) == HIGH) { //debounce 
+        Serial.print(" CLOSING THE DOOR ");
+        delay(1000);
+        currentState = IDLE;
+        lastActivityTime = millis();
+      }
+      // if is full
+      break;
+
+    case PROCESSING_WASTE:
+      //close door
+      Serial.print("WASTE RECIEVED");
+      // if is full
+
+    case CONTAINER_FULL:
+      // red led
+
   }
 }
-
-
