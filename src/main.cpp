@@ -3,8 +3,6 @@
 #include "Led.h"
 #include <EnableInterrupt.h>
 
-Led ledRED(4);  
-Led ledGREEN(7);
 enum State {
     IDLE,
     SLEEPING,
@@ -17,13 +15,13 @@ enum State {
 };
 
 State currentState = IDLE;
+Led ledRed(4);  
+Led ledGreen(7);
+GoToSleepTask goToSleepTask;
 
 unsigned long timeBeforeSleep = 5000;
 unsigned long lastActivityTime = millis();
 unsigned long timeToEnterWaste = 10000;
-
-
-GoToSleepTask goToSleepTask;
 
 int pirPin = 2;
 int buttonPin = 8;
@@ -41,7 +39,6 @@ void loop() {
   switch(currentState) {
 
     case IDLE:
-      // green led is on
       if (millis() - lastActivityTime > timeBeforeSleep) {
         goToSleepTask.tick();
         lastActivityTime = millis();
@@ -76,9 +73,10 @@ void loop() {
       //close door
       Serial.print("WASTE RECIEVED");
       // if is full
+      break;
 
     case CONTAINER_FULL:
       // red led
-
+      break;
   }
 }
