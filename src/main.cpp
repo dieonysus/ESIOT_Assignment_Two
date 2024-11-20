@@ -5,13 +5,12 @@
 #include "DoorControl.h"
 #include "ServoMotor.h"
 #include <EnableInterrupt.h>
+#include "DoorControl.h"
+#include "ServoMotor.h"
+#include <EnableInterrupt.h>
 
-Led ledRED(4);  
-Led ledGREEN(7);
 ServoMotor myServo(9);
 
-// #define ServoPin 9
-// #define OpenBtnPin 8
 #define CloseBtnPin 10
 #define buttonPin 8
 
@@ -27,13 +26,13 @@ enum State {
 };
 
 State currentState = IDLE;
+Led ledRed(4);  
+Led ledGreen(7);
+GoToSleepTask goToSleepTask;
 
 unsigned long timeBeforeSleep = 5000;
 unsigned long lastActivityTime = millis();
 unsigned long timeToEnterWaste = 10000;
-
-
-GoToSleepTask goToSleepTask;
 
 // DoorControl doorControl(ServoPin,buttonPin,CloseBtnPin);
 
@@ -48,19 +47,23 @@ void setup() {
   enableInterrupt(pirPin, wakeUp, RISING);
   pinMode(buttonPin, INPUT);
   // doorControl.init();
+  // doorControl.init();
 }
 
 void loop() {
     switch (currentState) {
 
     case IDLE:
-      // green led is on
       if (millis() - lastActivityTime > timeBeforeSleep) {
         goToSleepTask.tick();
         lastActivityTime = millis();
       } 
       else if (digitalRead(buttonPin) == HIGH) { //debounce
         Serial.print(" BUTTON ");
+        // doorControl.tick();
+        myServo.on();
+        myServo.openDoor();
+        myServo.off();
         // doorControl.tick();
         myServo.on();
         myServo.openDoor();
@@ -76,6 +79,9 @@ void loop() {
       delay(500);
       if (millis() - lastActivityTime > timeToEnterWaste) {
         Serial.print(" TIMEOUT ");
+        myServo.on();
+        myServo.closeDoor();
+        myServo.off();
         myServo.on();
         myServo.closeDoor();
         myServo.off();
@@ -96,12 +102,11 @@ void loop() {
       //close door
       Serial.print("WASTE RECIEVED");
       // if is full
-    break;
+      break;
     case CONTAINER_FULL:
       // red led
-    break;
+      break;
   }
-   
 }
   
 
