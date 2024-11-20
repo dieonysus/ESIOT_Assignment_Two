@@ -27,6 +27,12 @@ enum State {
 };
 
 State currentState = IDLE;
+Led ledRed(4);  
+Led ledGreen(7);
+GoToSleepTask goToSleepTask;
+Led ledRed(4);  
+Led ledGreen(7);
+GoToSleepTask goToSleepTask;
 
 unsigned long timeBeforeSleep = 5000;
 unsigned long lastActivityTime = millis();
@@ -54,7 +60,6 @@ void loop() {
     switch (currentState) {
 
     case IDLE:
-      // green led is on
       if (millis() - lastActivityTime > timeBeforeSleep) {
         goToSleepTask.tick();
         lastActivityTime = millis();
