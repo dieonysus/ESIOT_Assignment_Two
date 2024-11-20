@@ -9,14 +9,8 @@
 #include "ServoMotor.h"
 #include <EnableInterrupt.h>
 
-<<<<<<< HEAD
-=======
-Led ledRED(4);  
-Led ledGREEN(7);
 ServoMotor myServo(9);
 
-// #define ServoPin 9
-// #define OpenBtnPin 8
 #define CloseBtnPin 10
 #define buttonPin 8
 
@@ -35,18 +29,10 @@ State currentState = IDLE;
 Led ledRed(4);  
 Led ledGreen(7);
 GoToSleepTask goToSleepTask;
-Led ledRed(4);  
-Led ledGreen(7);
-GoToSleepTask goToSleepTask;
 
 unsigned long timeBeforeSleep = 5000;
 unsigned long lastActivityTime = millis();
 unsigned long timeToEnterWaste = 10000;
-
-<<<<<<< HEAD
-=======
-
-GoToSleepTask goToSleepTask;
 
 // DoorControl doorControl(ServoPin,buttonPin,CloseBtnPin);
 
@@ -65,7 +51,6 @@ void setup() {
 }
 
 void loop() {
-    switch (currentState) {
     switch (currentState) {
 
     case IDLE:
@@ -117,12 +102,11 @@ void loop() {
       //close door
       Serial.print("WASTE RECIEVED");
       // if is full
-    break;
+      break;
     case CONTAINER_FULL:
       // red led
-    break;
+      break;
   }
-   
 }
   
 
