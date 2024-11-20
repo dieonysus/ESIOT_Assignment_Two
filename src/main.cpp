@@ -2,7 +2,22 @@
 #include "GoToSleepTask.h"
 #include "Led.h"
 #include <EnableInterrupt.h>
+#include "DoorControl.h"
+#include "ServoMotor.h"
+#include <EnableInterrupt.h>
 
+<<<<<<< HEAD
+=======
+Led ledRED(4);  
+Led ledGREEN(7);
+ServoMotor myServo(9);
+
+// #define ServoPin 9
+// #define OpenBtnPin 8
+#define CloseBtnPin 10
+#define buttonPin 8
+
+>>>>>>> 3887756b81d895e800fd942d656203b0cab003bf
 enum State {
     IDLE,
     SLEEPING,
@@ -23,8 +38,16 @@ unsigned long timeBeforeSleep = 5000;
 unsigned long lastActivityTime = millis();
 unsigned long timeToEnterWaste = 10000;
 
+<<<<<<< HEAD
+=======
+
+GoToSleepTask goToSleepTask;
+
+// DoorControl doorControl(ServoPin,buttonPin,CloseBtnPin);
+
+>>>>>>> 3887756b81d895e800fd942d656203b0cab003bf
 int pirPin = 2;
-int buttonPin = 8;
+
 
 void wakeUp(){}
 
@@ -33,10 +56,11 @@ void setup() {
   pinMode(pirPin, INPUT_PULLUP); // read about floating pin!
   enableInterrupt(pirPin, wakeUp, RISING);
   pinMode(buttonPin, INPUT);
+  // doorControl.init();
 }
 
 void loop() {
-  switch(currentState) {
+    switch (currentState) {
 
     case IDLE:
       if (millis() - lastActivityTime > timeBeforeSleep) {
@@ -45,6 +69,10 @@ void loop() {
       } 
       else if (digitalRead(buttonPin) == HIGH) { //debounce
         Serial.print(" BUTTON ");
+        // doorControl.tick();
+        myServo.on();
+        myServo.openDoor();
+        myServo.off();
         currentState = WAITING_FOR_WASTE;
         lastActivityTime = millis();
       }
@@ -56,6 +84,9 @@ void loop() {
       delay(500);
       if (millis() - lastActivityTime > timeToEnterWaste) {
         Serial.print(" TIMEOUT ");
+        myServo.on();
+        myServo.closeDoor();
+        myServo.off();
         delay(1000);
         currentState = IDLE;
         lastActivityTime = millis();
@@ -73,10 +104,24 @@ void loop() {
       //close door
       Serial.print("WASTE RECIEVED");
       // if is full
+<<<<<<< HEAD
       break;
 
     case CONTAINER_FULL:
       // red led
       break;
+=======
+    break;
+    case CONTAINER_FULL:
+      // red led
+    break;
+>>>>>>> 3887756b81d895e800fd942d656203b0cab003bf
   }
+   
 }
+  
+
+ 
+
+
+
