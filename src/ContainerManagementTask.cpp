@@ -47,17 +47,17 @@ void ContainerManagementTask::tick() {
         state = CONTAINER_FULL;
         //LCD: PRESS CLOSE WHEN DONE
         if (closeButton->isPressed()) { // or timeout
+            //close door
             state = PROCESSING_WASTE;
         }
-        //if full -> container full state
+        //if full -> close door, container full state
         break;
 
     case PROCESSING_WASTE:
         //LCD: WASTE RECIEVED
         //DELAY T2
         //if full -> container full state
-        //else -> idle state
-
+        //else -> idle state 
         break;
 
     case CONTAINER_FULL:
