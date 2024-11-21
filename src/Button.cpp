@@ -1,7 +1,7 @@
 #include "Button.h"
 #include <Arduino.h>
 
-Button::Button(int pin,unsigned long debounceTime = 40){
+Button::Button(int pin, unsigned long debounceTime){
   this->pin = pin;
   buttonState = LOW;
   lastButtonState = LOW;
@@ -19,14 +19,15 @@ bool Button::isPressed(){
 
   if ((millis() - lastPressTime) > debounceTime) {
         if (reading != buttonState) {
+
           buttonState = reading;
+
           if (buttonState == HIGH) {
+            lastButtonState = reading;
             return true;
           }
         }
-        lastButtonState = reading;
-        return false;
       }
-
-  
+      lastButtonState = reading;
+      return false;
 }
