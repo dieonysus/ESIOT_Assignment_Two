@@ -1,18 +1,13 @@
-#include "MsgService.h"
+#include "ContainerManagementTask.h"
+
+ContainerManagementTask containerManagementTask;
 
 void setup() {
-  MsgService.init();
-  
+  Serial.begin(9600);
+  containerManagementTask.init();
+
 }
 
 void loop() {
-  if (MsgService.isMsgAvailable()) {
-    Msg* msg = MsgService.receiveMsg();    
-    if (msg->getContent() == "ping"){
-       delay(500);
-       MsgService.sendMsg("pong");
-    }
-    /* NOT TO FORGET: message deallocation */
-    delete msg;
-  }
+  containerManagementTask.tick();
 }
