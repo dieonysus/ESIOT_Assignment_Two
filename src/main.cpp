@@ -1,14 +1,18 @@
-//  #include <Arduino.h>
-#include "ContainerManagementTask.h"
-
-ContainerManagementTask containerManagementTask;
+#include "MsgService.h"
 
 void setup() {
-  Serial.begin(9600);
-  containerManagementTask.init();
-
+  MsgService.init();
+  
 }
 
 void loop() {
-  containerManagementTask.tick();
+  if (MsgService.isMsgAvailable()) {
+    Msg* msg = MsgService.receiveMsg();    
+    if (msg->getContent() == "ping"){
+       delay(500);
+       MsgService.sendMsg("pong");
+    }
+    /* NOT TO FORGET: message deallocation */
+    delete msg;
+  }
 }

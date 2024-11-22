@@ -6,6 +6,7 @@
 #include <avr/sleep.h>
 #include "Led.h"
 #include "Button.h"
+#include "ServoMotor.h"
 
 class ContainerManagementTask: public Task {
 
@@ -17,6 +18,7 @@ class ContainerManagementTask: public Task {
         Led* redLed;
         Button* openButton;
         Button* closeButton;
+        ServoMotor* door;
         
         unsigned long timeBeforeSleep;
         unsigned long lastActivityTime;
