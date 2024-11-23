@@ -12,12 +12,16 @@ void ContainerManagementTask::init() {
     buttonPin[0] = 12;
     buttonPin[1] = 13;
     servoPin = 9;
+    trigPin = 4; 
+    echoPin = 5;
 
     greenLed = new Led(ledPin[0]);
     redLed = new Led(ledPin[1]);
     openButton = new Button(buttonPin[0]);
     closeButton = new Button(buttonPin[1]);
     door = new ServoMotor(servoPin);
+    sonar = new Sonar(trigPin, echoPin); 
+    sonar->initSonar();                 
 
     pinMode(pirPin, INPUT_PULLUP);
     enableInterrupt(pirPin, wakeUp, RISING);
@@ -37,6 +41,7 @@ void ContainerManagementTask::init() {
 
 void ContainerManagementTask::tick() {
     unsigned long currentTime = millis();
+    long distance = sonar->measureDistance();
 
     switch(state) {
 
@@ -69,12 +74,27 @@ void ContainerManagementTask::tick() {
             state = PROCESSING_WASTE;
             lastActivityTime = currentTime;
         }
-        //if container full -> close door, container full state
+
+        else if (distance < 2)
+        {
+            door->close();
+            state = CONTAINER_FULL;
+        }
+
         break;
 
     case PROCESSING_WASTE:
         lcd->updateLine(0, "WASTE RECEIVED");
         lcd->updateLine(1, "");
+        
+        
+        if (distance < 2) { 
+            state = CONTAINER_FULL;
+        } 
+        
+        else {
+            state = IDLE;
+        }
         //close door
         //DELAY T2 (5000)
         //if container full -> container full state
