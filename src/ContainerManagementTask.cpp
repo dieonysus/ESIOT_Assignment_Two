@@ -1,5 +1,6 @@
 #include "ContainerManagementTask.h"
 #include <EnableInterrupt.h>
+#include "MsgService.h"
 
 ContainerManagementTask::ContainerManagementTask() {}
 
@@ -14,13 +15,16 @@ void ContainerManagementTask::init() {
     redLed = new Led(ledPin[1]);
     openButton = new Button(buttonPin[0]);
     closeButton = new Button(buttonPin[1]);
+    door = new ServoMotor(9);
 
     state = IDLE;
     pinMode(pirPin, INPUT_PULLUP);
-    enableInterrupt(12, wakeUp, RISING);
+    enableInterrupt(pirPin, wakeUp, RISING);
 
-    timeBeforeSleep = 2000;
+    timeBeforeSleep = 20000;
     lastActivityTime = millis();
+
+    MsgService.init();
 }
 
 
@@ -44,19 +48,18 @@ void ContainerManagementTask::tick() {
         break;
 
     case WAITING_FOR_WASTE:
-        state = CONTAINER_FULL;
         //LCD: PRESS CLOSE WHEN DONE
         if (closeButton->isPressed()) { // or timeout
             //close door
             state = PROCESSING_WASTE;
         }
-        //if full -> close door, container full state
+        //if container full -> close door, container full state
         break;
 
     case PROCESSING_WASTE:
         //LCD: WASTE RECIEVED
-        //DELAY T2
-        //if full -> container full state
+        //DELAY T2 (5000)
+        //if container full -> container full state
         //else -> idle state 
         break;
 
@@ -64,7 +67,6 @@ void ContainerManagementTask::tick() {
         //LCD: CONTAINER FULL
         greenLed->switchOff();
         redLed->switchOn();
-
         break;
     }
 }
