@@ -1,5 +1,6 @@
 #include "ContainerManagementTask.h"
 #include <EnableInterrupt.h>
+#include "MsgService.h"
 
 ContainerManagementTask::ContainerManagementTask() {}
 
@@ -18,9 +19,13 @@ void ContainerManagementTask::init() {
     door = new ServoMotor(servoPin);
 
     pinMode(pirPin, INPUT_PULLUP);
-    enableInterrupt(12, wakeUp, RISING);
+    enableInterrupt(pirPin, wakeUp, RISING);
     door->close();
 
+    MsgService.init();
+
+    lcd = new Lcd(0x27, 16, 4);
+    lcd->init();
     timeBeforeSleep = 10000;
     lastActivityTime = 0;
     timeBeforeCloseDoor = 2000;
@@ -36,8 +41,10 @@ void ContainerManagementTask::tick() {
 
     case IDLE:
         greenLed->switchOn();
-        //LCD: PRESS OPEN TO ENTER WASTE
-        if ((currentTime - lastActivityTime)  > timeBeforeSleep) {
+        redLed->switchOff();
+        lcd->updateLine(0, "PRESS OPEN TO");
+        lcd->updateLine(1, "ENTER WASTE");
+        if ((currentTime - lastActivityTime) > timeBeforeSleep) {
             state = SLEEPING;
         }
         if (openButton->isPressed()) {
@@ -48,34 +55,39 @@ void ContainerManagementTask::tick() {
         break;
 
     case SLEEPING: 
-        //LCD: SLEEP
+        lcd->updateLine(0, "SLEEP");
+        lcd->updateLine(1, "");
         goToSleep();
         break;
 
     case WAITING_FOR_WASTE:
+        lcd->updateLine(0, "PRESS CLOSE");
+        lcd->updateLine(1, "WHEN DONE");
         //LCD: PRESS CLOSE WHEN DONE
         if (closeButton->isPressed() || (currentTime - openDoorTime) >= timeBeforeCloseDoor) {
             door->close();
             state = PROCESSING_WASTE;
             lastActivityTime = currentTime;
         }
-        //if full -> close door, container full state
+        //if container full -> close door, container full state
         break;
 
     case PROCESSING_WASTE:
-        //LCD: WASTE RECIEVED
-        //DELAY T2
-        //if full -> container full state
+        lcd->updateLine(0, "WASTE RECEIVED");
+        lcd->updateLine(1, "");
+        //close door
+        //DELAY T2 (5000)
+        //if container full -> container full state
         //else -> idle state 
-        delay(100);
+        delay(500);
         state = IDLE;
         break;
 
     case CONTAINER_FULL:
-        //LCD: CONTAINER FULL
+        lcd->updateLine(0, "CONTAINER FULL");
+        lcd->updateLine(1, "");
         greenLed->switchOff();
         redLed->switchOn();
-
         break;
     }
 }
@@ -96,4 +108,6 @@ void ContainerManagementTask::goToSleep() {
 
 void ContainerManagementTask::wakeUp(){
 }
+
+
 
