@@ -9,19 +9,25 @@ void ServoMotor::on(){
  motor.attach(pin);
 }
 
-void ServoMotor::openDoor(){
+void ServoMotor::open(){
+  on();
   motor.write(180);
-  delay(300);
+  delay(500);
+  off();
 }
 
-void ServoMotor::closeDoor(){
+void ServoMotor::close(){
+  on();
   motor.write(90);
-  delay(300);
+  delay(500);
+  off();
 }
 
-void ServoMotor::openDoorReverse(){
+void ServoMotor::openReverse(){
+ on();
  motor.write(0);
- delay(300); 
+ delay(500); 
+ off();
 }
 
 void ServoMotor::off(){

@@ -9,31 +9,40 @@ void ContainerManagementTask::init() {
     ledPin[1] = 8;
     buttonPin[0] = 12;
     buttonPin[1] = 13;
+    servoPin = 9;
 
     greenLed = new Led(ledPin[0]);
     redLed = new Led(ledPin[1]);
     openButton = new Button(buttonPin[0]);
     closeButton = new Button(buttonPin[1]);
+    door = new ServoMotor(servoPin);
 
-    state = IDLE;
     pinMode(pirPin, INPUT_PULLUP);
     enableInterrupt(12, wakeUp, RISING);
+    door->close();
 
-    timeBeforeSleep = 2000;
-    lastActivityTime = millis();
+    timeBeforeSleep = 10000;
+    lastActivityTime = 0;
+    timeBeforeCloseDoor = 2000;
+    openDoorTime = 0;
+    state = IDLE;
 }
 
 
 void ContainerManagementTask::tick() {
-    switch (state) {
+    unsigned long currentTime = millis();
+
+    switch(state) {
 
     case IDLE:
         greenLed->switchOn();
         //LCD: PRESS OPEN TO ENTER WASTE
-        if (millis() - lastActivityTime > timeBeforeSleep) {
+        if ((currentTime - lastActivityTime)  > timeBeforeSleep) {
             state = SLEEPING;
         }
         if (openButton->isPressed()) {
+            door->open();
+            openDoorTime = currentTime;
             state = WAITING_FOR_WASTE;
         }
         break;
@@ -44,11 +53,11 @@ void ContainerManagementTask::tick() {
         break;
 
     case WAITING_FOR_WASTE:
-        state = CONTAINER_FULL;
         //LCD: PRESS CLOSE WHEN DONE
-        if (closeButton->isPressed()) { // or timeout
-            //close door
+        if (closeButton->isPressed() || (currentTime - openDoorTime) >= timeBeforeCloseDoor) {
+            door->close();
             state = PROCESSING_WASTE;
+            lastActivityTime = currentTime;
         }
         //if full -> close door, container full state
         break;
@@ -58,6 +67,8 @@ void ContainerManagementTask::tick() {
         //DELAY T2
         //if full -> container full state
         //else -> idle state 
+        delay(100);
+        state = IDLE;
         break;
 
     case CONTAINER_FULL:
