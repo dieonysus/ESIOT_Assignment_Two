@@ -1,6 +1,6 @@
 #ifndef __SERVOMOTOR__
 #define __SERVOMOTOR__
-#include <Servo.h>
+#include <ServoTimer2.h>
 
 class ServoMotor{
   public:
@@ -13,7 +13,7 @@ class ServoMotor{
   void on();
   void off();
   int pin;
-  Servo motor;
+  ServoTimer2 motor;
 };
 
 #endif

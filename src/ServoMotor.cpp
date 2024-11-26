@@ -11,21 +11,21 @@ void ServoMotor::on(){
 
 void ServoMotor::open(){
   on();
-  motor.write(180);
+  motor.write(2250);
   delay(500);
   off();
 }
 
 void ServoMotor::close(){
   on();
-  motor.write(90);
+  motor.write(1500);
   delay(500);
   off();
 }
 
 void ServoMotor::openReverse(){
  on();
- motor.write(0);
+ motor.write(750);
  delay(500); 
  off();
 }
