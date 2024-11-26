@@ -9,7 +9,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.util.Random;
@@ -17,37 +16,47 @@ import java.util.Random;
 public class Dashboard extends Application {
 
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage primaryStage) throws Exception{
 
-        Button greenButton = new Button("EMPTY");
-        Button redButton = new Button("RESTORE");
+        CommChannel channel = new SerialCommChannel("COM4",9600);
+        // CommChannel channel = new SerialCommChannel("/dev/cu.usbmodem1411",9600);
 
-        String buttonStyle = "-fx-background-color: #247BA0; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 5;";
-        greenButton.setStyle(buttonStyle);
-        redButton.setStyle("-fx-background-color: #FF1654; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 5;");
+        /* Waiting Arduino rebooting */
+        System.out.println("Waiting Arduino for rebooting...");
+        Thread.sleep(4000);
+        System.out.println("Ready.");
 
+        double sceneWidth = 400;
+        double sceneHeight = 260;
         double buttonWidth = 170;
         double buttonHeight = 120;
-        greenButton.setPrefSize(buttonWidth, buttonHeight);
-        redButton.setPrefSize(buttonWidth, buttonHeight);
+        double textFieldWidth = 170;
+        double textWidthHeight = 40;
+        String textFieldStyle = "-fx-background-color: #A8DADC; -fx-border-color: transparent;";
 
-        Color rectangleColor = Color.web("#A8DADC");
+        Button emptyButton = new Button("EMPTY");
+        Button restoreButton = new Button("RESTORE");
+
+        emptyButton.setStyle("-fx-background-color: #247BA0; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 5;");
+        restoreButton.setStyle("-fx-background-color: #FF1654; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 5;");
+
+        emptyButton.setPrefSize(buttonWidth, buttonHeight);
+        restoreButton.setPrefSize(buttonWidth, buttonHeight);
 
         TextField percentTextField = new TextField();
-        percentTextField.setPrefSize(170, 40);
-        percentTextField.setStyle("-fx-background-color: #A8DADC; -fx-border-color: transparent;");
+        percentTextField.setPrefSize(textFieldWidth, textWidthHeight);
+        percentTextField.setStyle(textFieldStyle);
         percentTextField.setEditable(false);
         percentTextField.setText("0%");
         percentTextField.setAlignment(Pos.CENTER);
 
         TextField tempTextField = new TextField();
-        tempTextField.setPrefSize(170, 40);
-        tempTextField.setStyle("-fx-background-color: #A8DADC; -fx-border-color: transparent;");
+        tempTextField.setPrefSize(textFieldWidth, textWidthHeight);
+        tempTextField.setStyle(textFieldStyle);
         tempTextField.setEditable(false);
         tempTextField.setText("0°C");
         tempTextField.setAlignment(Pos.CENTER);
-
-
+        
         Label tempLabel = new Label("Level of waste");
         tempLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
@@ -58,13 +67,13 @@ public class Dashboard extends Application {
         tempVBox.setAlignment(Pos.CENTER_LEFT);
         tempVBox.getChildren().addAll(tempLabel, percentTextField);
         VBox.setMargin(tempTextField, new javafx.geometry.Insets(0, 0, 20, 0));
-        tempVBox.getChildren().add(greenButton);
+        tempVBox.getChildren().add(emptyButton);
 
         VBox percentVBox = new VBox(5);
         percentVBox.setAlignment(Pos.CENTER_LEFT);
         percentVBox.getChildren().addAll(percentLabel, tempTextField);
         VBox.setMargin(percentTextField, new javafx.geometry.Insets(0, 0, 20, 0));
-        percentVBox.getChildren().add(redButton);
+        percentVBox.getChildren().add(restoreButton);
 
         HBox buttonBox = new HBox(20);
         buttonBox.getChildren().addAll(tempVBox, percentVBox);
@@ -75,32 +84,44 @@ public class Dashboard extends Application {
         vBox.setAlignment(Pos.BOTTOM_CENTER);
         VBox.setMargin(buttonBox, new javafx.geometry.Insets(0, 0, 20, 0));
 
-        Scene scene = new Scene(vBox, 400, 260);
+        Scene scene = new Scene(vBox, sceneWidth, sceneHeight);
         primaryStage.setTitle("Dashboard");
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
 
-        greenButton.setOnAction(event -> percentTextField.setText("Hello"));
-        redButton.setOnAction(event -> tempTextField.setText("Hello"));
+        emptyButton.setOnAction(event -> channel.sendMsg("empty"));
+        restoreButton.setOnAction(event -> channel.sendMsg("restore"));
+
 
         new Thread(() -> {
-            Random random = new Random();
             while (true) {
                 try {
-                    Thread.sleep(2000);
 
-                    String newPercent = random.nextInt(101) + "%";
-                    String newTemp = random.nextInt(100) + "°C";
-                    
+                    String newPercent = percentTextField.getText();
+                    String newTemp = tempTextField.getText();
+                    String msg = channel.receiveMsg();
+
+                    if (msg.startsWith("%")) {
+                        newPercent = msg;
+                    } else if (msg.startsWith("°C")){
+                        newTemp = msg;
+                    }
+
+                    final String percentage = newPercent;
+                    final String temperature = newTemp;
+
                     Platform.runLater(() -> {
-                        percentTextField.setText(newPercent);
-                        tempTextField.setText(newTemp);
+                        percentTextField.setText(percentage);
+                        tempTextField.setText(temperature);
                     });
+
+                    Thread.sleep(500);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
         }).start();
+
 
         primaryStage.show();
         vBox.requestFocus();
