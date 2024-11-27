@@ -7,7 +7,8 @@
 
 ContainerManagementTask::ContainerManagementTask() {}
 
-void ContainerManagementTask::init() {
+void ContainerManagementTask::init(int period) {
+    Task::init(period);
     pirPin = 2;
     ledPin[0] = 7;
     ledPin[1] = 8;
@@ -26,7 +27,7 @@ void ContainerManagementTask::init() {
     sonar->initSonar();                 
 
     pinMode(pirPin, INPUT_PULLUP);
-    enableInterrupt(pirPin, wakeUp, RISING);
+    enableInterrupt(12, wakeUp, RISING);
     door->close();
 
     MsgService.init();
@@ -75,9 +76,8 @@ void ContainerManagementTask::tick() {
         }
         break;
 
-    case SLEEPING: 
-        lcd->updateLine(0, "SLEEP");
-        lcd->updateLine(1, "");
+    case SLEEPING:
+        // LCD: SLEEP
         goToSleep();
         break;
 
