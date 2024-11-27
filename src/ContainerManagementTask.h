@@ -15,6 +15,7 @@ class ContainerManagementTask: public Task {
         int pirPin;
         int ledPin[2];
         int buttonPin[2];
+        int servoPin;
         Led* greenLed;
         Led* redLed;
         Button* openButton;
@@ -24,6 +25,8 @@ class ContainerManagementTask: public Task {
         
         unsigned long timeBeforeSleep;
         unsigned long lastActivityTime;
+        int openDoorTime;
+        int timeBeforeCloseDoor;        
 
         enum State {
             IDLE,

@@ -10,39 +10,46 @@ void ContainerManagementTask::init() {
     ledPin[1] = 8;
     buttonPin[0] = 12;
     buttonPin[1] = 13;
+    servoPin = 9;
 
     greenLed = new Led(ledPin[0]);
     redLed = new Led(ledPin[1]);
     openButton = new Button(buttonPin[0]);
     closeButton = new Button(buttonPin[1]);
-    door = new ServoMotor(9);
+    door = new ServoMotor(servoPin);
 
-    state = IDLE;
     pinMode(pirPin, INPUT_PULLUP);
     enableInterrupt(pirPin, wakeUp, RISING);
-
-    timeBeforeSleep = 5000;
-    lastActivityTime = millis();
+    door->close();
 
     MsgService.init();
 
     lcd = new Lcd(0x27, 16, 4);
     lcd->init();
+    timeBeforeSleep = 10000;
+    lastActivityTime = 0;
+    timeBeforeCloseDoor = 2000;
+    openDoorTime = 0;
+    state = IDLE;
 }
 
 
 void ContainerManagementTask::tick() {
-    switch (state) {
+    unsigned long currentTime = millis();
+
+    switch(state) {
 
     case IDLE:
         greenLed->switchOn();
         redLed->switchOff();
         lcd->updateLine(0, "PRESS OPEN TO");
         lcd->updateLine(1, "ENTER WASTE");
-        if (millis() - lastActivityTime > timeBeforeSleep) {
+        if ((currentTime - lastActivityTime) > timeBeforeSleep) {
             state = SLEEPING;
         }
         if (openButton->isPressed()) {
+            door->open();
+            openDoorTime = currentTime;
             state = WAITING_FOR_WASTE;
         }
         break;
@@ -56,9 +63,11 @@ void ContainerManagementTask::tick() {
     case WAITING_FOR_WASTE:
         lcd->updateLine(0, "PRESS CLOSE");
         lcd->updateLine(1, "WHEN DONE");
-        if (closeButton->isPressed()) { // or timeout
-            //close door
+        //LCD: PRESS CLOSE WHEN DONE
+        if (closeButton->isPressed() || (currentTime - openDoorTime) >= timeBeforeCloseDoor) {
+            door->close();
             state = PROCESSING_WASTE;
+            lastActivityTime = currentTime;
         }
         //if container full -> close door, container full state
         break;
@@ -70,6 +79,8 @@ void ContainerManagementTask::tick() {
         //DELAY T2 (5000)
         //if container full -> container full state
         //else -> idle state 
+        delay(500);
+        state = IDLE;
         break;
 
     case CONTAINER_FULL:

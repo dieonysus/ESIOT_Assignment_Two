@@ -1,19 +1,19 @@
 #ifndef __SERVOMOTOR__
 #define __SERVOMOTOR__
-#include <Servo.h>
+#include <ServoTimer2.h>
 
 class ServoMotor{
   public:
   ServoMotor(int pin);
-  void on();
-  void openDoor();
-  void closeDoor();
-  void openDoorReverse();
-  void off();
+  void open();
+  void close();
+  void openReverse();
   
   protected:
+  void on();
+  void off();
   int pin;
-  Servo motor;
+  ServoTimer2 motor;
 };
 
 #endif
