@@ -25,8 +25,8 @@ class ContainerManagementTask: public Task {
         
         unsigned long timeBeforeSleep;
         unsigned long lastActivityTime;
-        int openDoorTime;
-        int timeBeforeCloseDoor;        
+        unsigned long openDoorTime;
+        unsigned long timeBeforeCloseDoor;        
 
         enum State {
             IDLE,
