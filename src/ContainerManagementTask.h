@@ -47,7 +47,7 @@ class ContainerManagementTask: public Task {
 
     public:
         ContainerManagementTask();
-        void init();
+        void init(int period);
         void tick();
 
     private:

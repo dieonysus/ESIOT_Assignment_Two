@@ -5,7 +5,8 @@
 
 ContainerManagementTask::ContainerManagementTask() {}
 
-void ContainerManagementTask::init() {
+void ContainerManagementTask::init(int period) {
+    Task::init(period);
     pirPin = 2;
     ledPin[0] = 7;
     ledPin[1] = 8;
@@ -24,7 +25,7 @@ void ContainerManagementTask::init() {
     sonar->initSonar();                 
 
     pinMode(pirPin, INPUT_PULLUP);
-    enableInterrupt(pirPin, wakeUp, RISING);
+    enableInterrupt(12, wakeUp, RISING);
     door->close();
 
     MsgService.init();
@@ -47,22 +48,20 @@ void ContainerManagementTask::tick() {
 
     case IDLE:
         greenLed->switchOn();
-        redLed->switchOff();
-        lcd->updateLine(0, "PRESS OPEN TO");
-        lcd->updateLine(1, "ENTER WASTE");
+        // LCD: PRESS OPEN TO ENTER WASTE
         if ((currentTime - lastActivityTime) > timeBeforeSleep) {
             state = SLEEPING;
         }
         if (openButton->isPressed()) {
             door->open();
+            Serial.println("Open");
             openDoorTime = currentTime;
             state = WAITING_FOR_WASTE;
         }
         break;
 
-    case SLEEPING: 
-        lcd->updateLine(0, "SLEEP");
-        lcd->updateLine(1, "");
+    case SLEEPING:
+        // LCD: SLEEP
         goToSleep();
         break;
 
@@ -71,6 +70,7 @@ void ContainerManagementTask::tick() {
         lcd->updateLine(1, "WHEN DONE");
         if (closeButton->isPressed() || (currentTime - openDoorTime) >= timeBeforeCloseDoor) {
             door->close();
+            Serial.println("Close");
             state = PROCESSING_WASTE;
             lastActivityTime = currentTime;
         }
@@ -99,15 +99,15 @@ void ContainerManagementTask::tick() {
         //DELAY T2 (5000)
         //if container full -> container full state
         //else -> idle state 
-        delay(500);
+        delay(100);
         state = IDLE;
         break;
 
     case CONTAINER_FULL:
-        lcd->updateLine(0, "CONTAINER FULL");
-        lcd->updateLine(1, "");
-        greenLed->switchOff();
-        redLed->switchOn();
+        //LCD: CONTAINER FULL
+        // greenLed->switchOff();
+        // redLed->switchOn();
+        
         break;
     }
 }
@@ -128,6 +128,3 @@ void ContainerManagementTask::goToSleep() {
 
 void ContainerManagementTask::wakeUp(){
 }
-
-
-
