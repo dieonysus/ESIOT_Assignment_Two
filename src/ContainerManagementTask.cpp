@@ -55,7 +55,6 @@ void ContainerManagementTask::tick() {
         }
         if (openButton->isPressed()) {
             door->open();
-            Serial.println("Open");
             openDoorTime = currentTime;
             state = WAITING_FOR_WASTE;
         }
@@ -72,7 +71,6 @@ void ContainerManagementTask::tick() {
         lcd->updateLine(1, "WHEN DONE");
         if (closeButton->isPressed() || (currentTime - openDoorTime) >= timeBeforeCloseDoor) {
             door->close();
-            Serial.println("Close");
             state = PROCESSING_WASTE;
             lastActivityTime = currentTime;
         }
