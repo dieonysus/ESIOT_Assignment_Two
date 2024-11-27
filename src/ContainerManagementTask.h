@@ -8,6 +8,7 @@
 #include "Button.h"
 #include "ServoMotor.h"
 #include "Lcd.h"
+#include "Sonar.h"
 
 class ContainerManagementTask: public Task {
 
@@ -16,13 +17,16 @@ class ContainerManagementTask: public Task {
         int ledPin[2];
         int buttonPin[2];
         int servoPin;
+        int echoPin;
+        int trigPin;
+
         Led* greenLed;
         Led* redLed;
         Button* openButton;
         Button* closeButton;
         ServoMotor* door;
         Lcd* lcd;
-        
+        Sonar* sonar;
         unsigned long timeBeforeSleep;
         unsigned long lastActivityTime;
         unsigned long openDoorTime;
