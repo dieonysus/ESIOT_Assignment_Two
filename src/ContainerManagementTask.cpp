@@ -64,11 +64,7 @@ void ContainerManagementTask::tick() {
     case WAITING_FOR_WASTE:
         lcd->updateLine(0, "PRESS CLOSE");
         lcd->updateLine(1, "WHEN DONE");
-        //LCD: PRESS CLOSE WHEN DONE
         if (closeButton->isPressed() || (currentTime - openDoorTime) >= timeBeforeCloseDoor) {
-            Serial.print(currentTime);
-            Serial.print(" - ");
-            Serial.print(openDoorTime);
             door->close();
             state = PROCESSING_WASTE;
             lastActivityTime = currentTime;
