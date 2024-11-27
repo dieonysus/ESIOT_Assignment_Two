@@ -1,6 +1,7 @@
 #include "ContainerManagementTask.h"
 #include <EnableInterrupt.h>
 #include "MsgService.h"
+#include "Arduino.h"
 
 ContainerManagementTask::ContainerManagementTask() {}
 
@@ -26,9 +27,9 @@ void ContainerManagementTask::init() {
 
     lcd = new Lcd(0x27, 16, 4);
     lcd->init();
-    timeBeforeSleep = 10000;
+    timeBeforeSleep = 20000;
     lastActivityTime = 0;
-    timeBeforeCloseDoor = 2000;
+    timeBeforeCloseDoor = 10000;
     openDoorTime = 0;
     state = IDLE;
 }
@@ -63,7 +64,6 @@ void ContainerManagementTask::tick() {
     case WAITING_FOR_WASTE:
         lcd->updateLine(0, "PRESS CLOSE");
         lcd->updateLine(1, "WHEN DONE");
-        //LCD: PRESS CLOSE WHEN DONE
         if (closeButton->isPressed() || (currentTime - openDoorTime) >= timeBeforeCloseDoor) {
             door->close();
             state = PROCESSING_WASTE;
