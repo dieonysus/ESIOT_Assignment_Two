@@ -33,6 +33,11 @@ void MsgServiceClass::sendMsg(const String& msg){
   Serial.println(msg);  
 }
 
+void MsgServiceClass::sendVolume(const long& msg){
+  Serial.print(msg);  
+  Serial.println("%");
+}
+
 void serialEvent() {
   /* reading the content */
   while (Serial.available()) {

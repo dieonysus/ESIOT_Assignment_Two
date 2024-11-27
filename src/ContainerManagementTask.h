@@ -29,8 +29,12 @@ class ContainerManagementTask: public Task {
         Sonar* sonar;
         unsigned long timeBeforeSleep;
         unsigned long lastActivityTime;
-        unsigned long openDoorTime;
-        unsigned long timeBeforeCloseDoor;        
+        unsigned long timeDoorOpened;
+        unsigned long timeBeforeCloseDoor;      
+        long containerVolume;
+        long sonarDistanceFromContainer;  
+        long lastDataSentTime;
+        long prevFillingPercantage;
 
         enum State {
             IDLE,
@@ -39,10 +43,10 @@ class ContainerManagementTask: public Task {
             PROCESSING_WASTE,
             CONTAINER_FULL,
             EMPTYING_PROCESS,
-            RESTORE,
-            TEMPERATURE_PROBLEM
+            RESTORE
         };
         State state;
+        State stateAfterWakeUp;
 
 
     public:
