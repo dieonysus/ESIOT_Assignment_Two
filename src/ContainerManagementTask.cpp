@@ -48,7 +48,8 @@ void ContainerManagementTask::tick() {
 
     case IDLE:
         greenLed->switchOn();
-        // LCD: PRESS OPEN TO ENTER WASTE
+        lcd->updateLine(0, "Press Open To");
+        lcd->updateLine(1, "Enter Waste");
         if ((currentTime - lastActivityTime) > timeBeforeSleep) {
             state = SLEEPING;
         }
@@ -61,7 +62,8 @@ void ContainerManagementTask::tick() {
         break;
 
     case SLEEPING:
-        // LCD: SLEEP
+        lcd->updateLine(0, "Sleep...");
+        lcd->updateLine(1, "");
         goToSleep();
         break;
 
@@ -86,7 +88,7 @@ void ContainerManagementTask::tick() {
     case PROCESSING_WASTE:
         lcd->updateLine(0, "WASTE RECEIVED");
         lcd->updateLine(1, "");
-        
+        delay(500);
         
         if (distance < 2) { 
             state = CONTAINER_FULL;
@@ -99,12 +101,14 @@ void ContainerManagementTask::tick() {
         //DELAY T2 (5000)
         //if container full -> container full state
         //else -> idle state 
-        delay(100);
-        state = IDLE;
+        
+        //state = IDLE;
         break;
 
     case CONTAINER_FULL:
         //LCD: CONTAINER FULL
+        lcd->updateLine(0, "Container Full");
+        lcd->updateLine(1, "");
         // greenLed->switchOff();
         // redLed->switchOn();
         
