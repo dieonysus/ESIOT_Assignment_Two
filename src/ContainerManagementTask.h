@@ -42,8 +42,7 @@ class ContainerManagementTask: public Task {
             WAITING_FOR_WASTE,
             PROCESSING_WASTE,
             CONTAINER_FULL,
-            EMPTYING_PROCESS,
-            RESTORE
+            EMPTYING
         };
         State state;
         State stateAfterWakeUp;

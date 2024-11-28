@@ -51,10 +51,10 @@ void ContainerManagementTask::tick() {
     unsigned long currentTime = millis();
     long distance = sonar->measureDistance();
     long fillingPercentage = (containerVolume + sonarDistanceFromContainer - distance) * 100 / containerVolume;
-    if (currentTime - lastDataSentTime >= 1000 && fillingPercentage > prevFillingPercantage && fillingPercentage <= 100) {
-        MsgService.sendVolume(fillingPercentage);
+    if (currentTime - lastDataSentTime >= 1000 && fillingPercentage >= prevFillingPercantage && fillingPercentage <= 100) {
         lastDataSentTime = currentTime;
         prevFillingPercantage = fillingPercentage;
+        MsgService.sendVolume(fillingPercentage);
     }
 
     switch(state) {
@@ -87,7 +87,9 @@ void ContainerManagementTask::tick() {
         if (closeButton->isPressed() || (currentTime - timeDoorOpened) >= timeBeforeCloseDoor) {
             state = PROCESSING_WASTE;
         }
-        else if (fillingPercentage >= 100) {
+        else if (prevFillingPercantage >= 100) {
+            lastActivityTime = currentTime;
+            door->close();
             state = CONTAINER_FULL;
         }
         break;
@@ -98,7 +100,8 @@ void ContainerManagementTask::tick() {
         lcd->updateLine(0, "WASTE RECEIVED");
         lcd->updateLine(1, "");
         delay(5000);
-        if (fillingPercentage >= 100) { 
+        if (prevFillingPercantage >= 100) {
+            door->close();
             state = CONTAINER_FULL;
         } 
         else {
@@ -107,15 +110,31 @@ void ContainerManagementTask::tick() {
         break;
 
     case CONTAINER_FULL:
-        door->close();
         lcd->updateLine(0, "CONTAINER FULL");
         lcd->updateLine(1, "");
         greenLed->switchOff();
         redLed->switchOn();
+        if (MsgService.isMsgAvailable()) {
+            Msg* msg = MsgService.receiveMsg();
+            if (msg->getContent() == "empty"){
+                delay(100);
+                state = EMPTYING;
+            }
+        }
         if (currentTime - lastActivityTime > timeBeforeSleep) {
             stateAfterWakeUp = CONTAINER_FULL;
             state = SLEEPING;
         }
+        break;
+
+    case EMPTYING:
+        door->openReverse();
+        prevFillingPercantage = 0;
+        MsgService.sendMsg("0%");
+        delay(2000);
+        door->close();
+        lastActivityTime = currentTime;
+        state = IDLE;
         break;
     }
 }
