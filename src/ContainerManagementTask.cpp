@@ -101,7 +101,6 @@ void ContainerManagementTask::tick() {
         lcd->updateLine(1, "");
         delay(5000);
         if (prevFillingPercantage >= 100) {
-            door->close();
             state = CONTAINER_FULL;
         } 
         else {
@@ -155,5 +154,5 @@ void ContainerManagementTask::wakeUp(){
 }
 
 // TODO: doesnt become full from processing_waste state
-// reverse open after during emptying + close back
+// door doesnt move 90
 
