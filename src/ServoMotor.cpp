@@ -1,5 +1,5 @@
+#include <Arduino.h>
 #include "ServoMotor.h"
-#include "Arduino.h"
 
 ServoMotor::ServoMotor(int pin){
   this->pin = pin;
@@ -11,22 +11,22 @@ void ServoMotor::on(){
 
 void ServoMotor::open(){
   on();
-  motor.write(2250);
+  motor.write(2350);
   delay(500);
   off();
 }
 
 void ServoMotor::close(){
   on();
-  motor.write(1500);
+  motor.write(1350);
   delay(500);
   off();
 }
 
 void ServoMotor::openReverse(){
  on();
- motor.write(750);
- delay(500); 
+ motor.write(550);
+ delay(1000); 
  off();
 }
 

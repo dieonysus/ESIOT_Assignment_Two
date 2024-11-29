@@ -1,14 +1,17 @@
-#include <Arduino.h>
+#include "Arduino.h"
 #include "ContainerManagementTask.h"
+#include "Scheduler.h"
 
-ContainerManagementTask containerManagementTask;
+Scheduler sched;
 
 void setup() {
   Serial.begin(9600);
-  containerManagementTask.init();
-
+  sched.init(100);
+  Task* t0 = new ContainerManagementTask();
+  t0->init(100); 
+  sched.addTask(t0);
 }
 
 void loop() {
-  containerManagementTask.tick();
+  sched.schedule();
 }
