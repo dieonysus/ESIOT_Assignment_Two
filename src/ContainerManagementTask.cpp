@@ -36,7 +36,7 @@ void ContainerManagementTask::init(int period) {
     lcd->init();
     timeBeforeSleep = 10000;
     lastActivityTime = 0;
-    timeBeforeCloseDoor = 10000;
+    timeBeforeCloseDoor = 5000;
     timeDoorOpened = 0;
     lastDataSentTime = 0;
     state = IDLE;
