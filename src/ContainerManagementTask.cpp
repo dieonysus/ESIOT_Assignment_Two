@@ -9,8 +9,6 @@ ContainerManagementTask::ContainerManagementTask() {}
 
 void ContainerManagementTask::init(int period) {
     Task::init(period);
-void ContainerManagementTask::init(int period) {
-    Task::init(period);
     pirPin = 2;
     ledPin[0] = 7;
     ledPin[1] = 8;
