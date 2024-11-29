@@ -2,6 +2,8 @@
 #include <EnableInterrupt.h>
 #include "MsgService.h"
 #include "Arduino.h"
+#include "string.h"
+
 
 ContainerManagementTask::ContainerManagementTask() {}
 
@@ -31,17 +33,29 @@ void ContainerManagementTask::init() {
 
     lcd = new Lcd(0x27, 16, 4);
     lcd->init();
-    timeBeforeSleep = 20000;
+    timeBeforeSleep = 10000;
     lastActivityTime = 0;
     timeBeforeCloseDoor = 10000;
-    openDoorTime = 0;
+    timeDoorOpened = 0;
+    lastDataSentTime = 0;
     state = IDLE;
+
+    containerVolume = 20;
+    sonarDistanceFromContainer = 5;
+    prevFillingPercantage = 0;
+    stateAfterWakeUp = IDLE;
 }
 
 
 void ContainerManagementTask::tick() {
     unsigned long currentTime = millis();
     long distance = sonar->measureDistance();
+    long fillingPercentage = (containerVolume + sonarDistanceFromContainer - distance) * 100 / containerVolume;
+    if (currentTime - lastDataSentTime >= 1000 && fillingPercentage >= prevFillingPercantage && fillingPercentage <= 100) {
+        lastDataSentTime = currentTime;
+        prevFillingPercantage = fillingPercentage;
+        MsgService.sendVolume(fillingPercentage);
+    }
 
     switch(state) {
 
@@ -50,13 +64,14 @@ void ContainerManagementTask::tick() {
         redLed->switchOff();
         lcd->updateLine(0, "PRESS OPEN TO");
         lcd->updateLine(1, "ENTER WASTE");
-        if ((currentTime - lastActivityTime) > timeBeforeSleep) {
+        if (currentTime - lastActivityTime > timeBeforeSleep) {
+            stateAfterWakeUp = IDLE;
             state = SLEEPING;
         }
-        if (openButton->isPressed()) {
-            door->open();
-            openDoorTime = currentTime;
+        else if (openButton->isPressed()) {
             state = WAITING_FOR_WASTE;
+            timeDoorOpened = currentTime;
+            door->open();
         }
         break;
 
@@ -69,38 +84,28 @@ void ContainerManagementTask::tick() {
     case WAITING_FOR_WASTE:
         lcd->updateLine(0, "PRESS CLOSE");
         lcd->updateLine(1, "WHEN DONE");
-        if (closeButton->isPressed() || (currentTime - openDoorTime) >= timeBeforeCloseDoor) {
-            door->close();
+        if (closeButton->isPressed() || (currentTime - timeDoorOpened) >= timeBeforeCloseDoor) {
             state = PROCESSING_WASTE;
-            lastActivityTime = currentTime;
         }
-
-        else if (distance < 2)
-        {
+        else if (prevFillingPercantage >= 100) {
+            lastActivityTime = currentTime;
             door->close();
             state = CONTAINER_FULL;
         }
-
         break;
 
     case PROCESSING_WASTE:
+        door->close();
+        lastActivityTime = currentTime;
         lcd->updateLine(0, "WASTE RECEIVED");
         lcd->updateLine(1, "");
-        
-        
-        if (distance < 2) { 
+        delay(5000);
+        if (prevFillingPercantage >= 100) {
             state = CONTAINER_FULL;
         } 
-        
         else {
             state = IDLE;
-        }
-        //close door
-        //DELAY T2 (5000)
-        //if container full -> container full state
-        //else -> idle state 
-        delay(500);
-        state = IDLE;
+        } 
         break;
 
     case CONTAINER_FULL:
@@ -108,26 +113,46 @@ void ContainerManagementTask::tick() {
         lcd->updateLine(1, "");
         greenLed->switchOff();
         redLed->switchOn();
+        if (MsgService.isMsgAvailable()) {
+            Msg* msg = MsgService.receiveMsg();
+            if (msg->getContent() == "empty"){
+                delay(100);
+                state = EMPTYING;
+            }
+        }
+        if (currentTime - lastActivityTime > timeBeforeSleep) {
+            stateAfterWakeUp = CONTAINER_FULL;
+            state = SLEEPING;
+        }
+        break;
+
+    case EMPTYING:
+        door->openReverse();
+        prevFillingPercantage = 0;
+        MsgService.sendMsg("0%");
+        delay(2000);
+        door->close();
+        lastActivityTime = currentTime;
+        state = IDLE;
         break;
     }
 }
 
 
 void ContainerManagementTask::goToSleep() {
-    Serial.print(" SLEEP");
     delay(1000);
     set_sleep_mode(SLEEP_MODE_PWR_DOWN);
     sleep_enable();
     sleep_mode();
 
-    Serial.print(" WAKE UP ");
     sleep_disable();
     lastActivityTime = millis();
-    state = IDLE;
+    state = stateAfterWakeUp;
 }
 
 void ContainerManagementTask::wakeUp(){
 }
 
-
+// TODO: doesnt become full from processing_waste state
+// door doesnt move 90
 

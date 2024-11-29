@@ -18,13 +18,13 @@ public class Dashboard extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
 
-//        CommChannel channel = new SerialCommChannel("COM4",9600);
-//        // CommChannel channel = new SerialCommChannel("/dev/cu.usbmodem1411",9600);
-//
-//        /* Waiting Arduino rebooting */
-//        System.out.println("Waiting Arduino for rebooting...");
-//        Thread.sleep(4000);
-//        System.out.println("Ready.");
+        CommChannel channel = new SerialCommChannel("COM3",9600);
+        // CommChannel channel = new SerialCommChannel("/dev/cu.usbmodem1411",9600);
+
+        /* Waiting Arduino rebooting */
+        System.out.println("Waiting Arduino for rebooting...");
+        Thread.sleep(4000);
+        System.out.println("Ready.");
 
         double sceneWidth = 400;
         double sceneHeight = 260;
@@ -90,39 +90,39 @@ public class Dashboard extends Application {
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
 
-//        emptyButton.setOnAction(event -> channel.sendMsg("empty"));
-//        restoreButton.setOnAction(event -> channel.sendMsg("restore"));
+        emptyButton.setOnAction(event -> channel.sendMsg("empty"));
+        restoreButton.setOnAction(event -> channel.sendMsg("restore"));
 
 
-        
-//        new Thread(() -> {
-//            while (true) {
-//                try {
-//
-//                    String newPercent = percentTextField.getText();
-//                    String newTemp = tempTextField.getText();
-//                    String msg = channel.receiveMsg();
-//
-//                    if (msg.startsWith("%")) {
-//                        newPercent = msg;
-//                    } else if (msg.startsWith("°C")){
-//                        newTemp = msg;
-//                    }
-//
-//                    final String percentage = newPercent;
-//                    final String temperature = newTemp;
-//
-//                    Platform.runLater(() -> {
-//                        percentTextField.setText(percentage);
-//                        tempTextField.setText(temperature);
-//                    });
-//
-//                    Thread.sleep(500);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }).start();
+        new Thread(() -> {
+            while (true) {
+                try {
+
+                    String newPercent = percentTextField.getText();
+                    String newTemp = tempTextField.getText();
+                    String msg = channel.receiveMsg();
+
+                    if (msg.endsWith("%")) {
+                        newPercent = msg;
+                    }
+                    if (msg.startsWith("°C")) {
+                        newTemp = msg;
+                    }
+
+                    final String percentage = newPercent;
+                    final String temperature = newTemp;
+
+                    Platform.runLater(() -> {
+                        percentTextField.setText(percentage);
+                        tempTextField.setText(temperature);
+                    });
+
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
 
 
         primaryStage.show();
