@@ -57,7 +57,7 @@ void ContainerManagementTask::tick() {
         MsgService.sendVolume(fillingPercentage);
     }
 
-    switch(state) {
+    switch (state) {
 
     case IDLE:
         greenLed->switchOn();
