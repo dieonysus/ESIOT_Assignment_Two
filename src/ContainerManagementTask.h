@@ -13,20 +13,20 @@
 class ContainerManagementTask: public Task {
 
     private:
+        Lcd* lcd;
+        ServoMotor* door;
+        Led* greenLed;
+        Led* redLed;
+
         int pirPin;
-        int ledPin[2];
         int buttonPin[2];
-        int servoPin;
         int echoPin;
         int trigPin;
 
-        Led* greenLed;
-        Led* redLed;
         Button* openButton;
         Button* closeButton;
-        ServoMotor* door;
-        Lcd* lcd;
         Sonar* sonar;
+
         unsigned long timeBeforeSleep;
         unsigned long lastActivityTime;
         unsigned long timeDoorOpened;
@@ -49,7 +49,7 @@ class ContainerManagementTask: public Task {
 
 
     public:
-        ContainerManagementTask();
+        ContainerManagementTask(Lcd* lcd, ServoMotor* door, Led* greenLed, Led* redLed);
         void init();
         void tick();
 
