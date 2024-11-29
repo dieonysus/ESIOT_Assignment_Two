@@ -18,7 +18,7 @@ void ServoMotor::open(){
 
 void ServoMotor::close(){
   on();
-  motor.write(1350);
+  motor.write(1400);
   delay(500);
   off();
 }

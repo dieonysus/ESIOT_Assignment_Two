@@ -27,7 +27,7 @@ void ContainerManagementTask::init(int period) {
     sonar->initSonar();                 
 
     pinMode(pirPin, INPUT_PULLUP);
-    enableInterrupt(12, wakeUp, RISING);
+    enableInterrupt(pirPin, wakeUp, RISING);
     door->close();
 
     MsgService.init();
