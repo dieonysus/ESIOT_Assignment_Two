@@ -16,7 +16,7 @@ void setup() {
   
   containerManagementTask.init(100);
   sched.init(100);
-  sched.addTask(containerManagementTask);
+  sched.addTask(&containerManagementTask);
 }
 
 void loop() {
