@@ -12,7 +12,8 @@ ContainerManagementTask::ContainerManagementTask(Lcd* lcd, ServoMotor* door, Led
     this->redLed = redLed;
 }
 
-void ContainerManagementTask::init() {
+void ContainerManagementTask::init(int period) {
+    Task::init(period);
     pirPin = 2;
     buttonPin[0] = 12;
     buttonPin[1] = 13;
@@ -32,7 +33,7 @@ void ContainerManagementTask::init() {
 
     timeBeforeSleep = 10000;
     lastActivityTime = 0;
-    timeBeforeCloseDoor = 10000;
+    timeBeforeCloseDoor = 5000;
     timeDoorOpened = 0;
     lastDataSentTime = 0;
     state = IDLE;
@@ -74,8 +75,8 @@ void ContainerManagementTask::tick() {
         }
         break;
 
-    case SLEEPING: 
-        lcd->updateLine(0, "SLEEP");
+    case SLEEPING:
+        lcd->updateLine(0, "Sleep...");
         lcd->updateLine(1, "");
         goToSleep();
         break;
@@ -108,7 +109,8 @@ void ContainerManagementTask::tick() {
         break;
 
     case CONTAINER_FULL:
-        lcd->updateLine(0, "CONTAINER FULL");
+        //LCD: CONTAINER FULL
+        lcd->updateLine(0, "Container Full");
         lcd->updateLine(1, "");
         greenLed->switchOff();
         redLed->switchOn();

@@ -50,7 +50,7 @@ class ContainerManagementTask: public Task {
 
     public:
         ContainerManagementTask(Lcd* lcd, ServoMotor* door, Led* greenLed, Led* redLed);
-        void init();
+        void init(int period);
         void tick();
 
     private:
