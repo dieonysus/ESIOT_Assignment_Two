@@ -8,6 +8,8 @@ Led redLed(8);
 
 ContainerManagementTask containerManagementTask(&lcd, &door, &greenLed, &redLed);
 
+
+
 void setup() {
   Serial.begin(9600);
   lcd.init();
