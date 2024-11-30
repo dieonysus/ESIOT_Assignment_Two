@@ -5,37 +5,35 @@
 #include "string.h"
 
 
-ContainerManagementTask::ContainerManagementTask() {}
+ContainerManagementTask::ContainerManagementTask(Lcd* lcd, ServoMotor* door, Led* greenLed, Led* redLed) {
+    this->lcd = lcd;
+    this->door = door;
+    this->greenLed = greenLed;
+    this->redLed = redLed;
+}
 
-void ContainerManagementTask::init() {
+void ContainerManagementTask::init(int period) {
+    Task::init(period);
     pirPin = 2;
-    ledPin[0] = 7;
-    ledPin[1] = 8;
     buttonPin[0] = 12;
     buttonPin[1] = 13;
-    servoPin = 9;
     trigPin = 4; 
     echoPin = 5;
 
-    greenLed = new Led(ledPin[0]);
-    redLed = new Led(ledPin[1]);
     openButton = new Button(buttonPin[0]);
     closeButton = new Button(buttonPin[1]);
-    door = new ServoMotor(servoPin);
+
     sonar = new Sonar(trigPin, echoPin); 
     sonar->initSonar();                 
 
     pinMode(pirPin, INPUT_PULLUP);
     enableInterrupt(pirPin, wakeUp, RISING);
-    door->close();
 
     MsgService.init();
 
-    lcd = new Lcd(0x27, 16, 4);
-    lcd->init();
     timeBeforeSleep = 10000;
     lastActivityTime = 0;
-    timeBeforeCloseDoor = 10000;
+    timeBeforeCloseDoor = 5000;
     timeDoorOpened = 0;
     lastDataSentTime = 0;
     state = IDLE;
@@ -44,6 +42,8 @@ void ContainerManagementTask::init() {
     sonarDistanceFromContainer = 5;
     prevFillingPercantage = 0;
     stateAfterWakeUp = IDLE;
+
+    door->close();
 }
 
 
@@ -75,8 +75,8 @@ void ContainerManagementTask::tick() {
         }
         break;
 
-    case SLEEPING: 
-        lcd->updateLine(0, "SLEEP");
+    case SLEEPING:
+        lcd->updateLine(0, "Sleep...");
         lcd->updateLine(1, "");
         goToSleep();
         break;
@@ -109,7 +109,8 @@ void ContainerManagementTask::tick() {
         break;
 
     case CONTAINER_FULL:
-        lcd->updateLine(0, "CONTAINER FULL");
+        //LCD: CONTAINER FULL
+        lcd->updateLine(0, "Container Full");
         lcd->updateLine(1, "");
         greenLed->switchOff();
         redLed->switchOn();

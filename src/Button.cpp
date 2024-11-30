@@ -12,21 +12,21 @@ Button::Button(int pin,unsigned long debounceTime = 40){
 
 bool Button::isPressed(){
   int reading = digitalRead(pin);
+  unsigned long prstm = millis();
 
   if (reading != lastButtonState) {
-        lastPressTime = millis();
+        lastPressTime = prstm;
       }
 
-  if ((millis() - lastPressTime) > debounceTime) {
+  if ((prstm - lastPressTime) > debounceTime) {
         if (reading != buttonState) {
           buttonState = reading;
           if (buttonState == HIGH) {
+            Serial.println("pressed");
             return true;
           }
         }
         lastButtonState = reading;
         return false;
-      }
-
-  
+      } 
 }
