@@ -2,6 +2,10 @@
 #define __TEMPERATUREMONITORINGTASK__
 
 #include "Task.h"
+#include "TempSensor.h"
+#include "Lcd.h"
+#include "ServoMotor.h"
+#include "Led.h"
 
 class TemperatureMonitoringTask : public Task {
 
@@ -13,9 +17,16 @@ class TemperatureMonitoringTask : public Task {
         };
         State state;
 
+        Lcd* lcd;
+        ServoMotor* door;
+        Led* greenLed;
+        Led* redLed;
+
+        TempSensor* tempSensor;
+
     public:
-        TemperatureMonitoringTask();
-        void init();
+        TemperatureMonitoringTask(Lcd* lcd, ServoMotor* door, Led* greenLed, Led* redLed);
+        void init(int period);
         void tick();
 };
 

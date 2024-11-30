@@ -1,4 +1,4 @@
-#include "Temp.h"
+#include "TempSensor.h"
 
 
 TempSensor::TempSensor(int pin) : sensorPin(pin) {}

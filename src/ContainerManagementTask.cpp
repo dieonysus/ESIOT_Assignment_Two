@@ -76,7 +76,7 @@ void ContainerManagementTask::tick() {
         break;
 
     case SLEEPING:
-        lcd->updateLine(0, "Sleep...");
+        lcd->updateLine(0, "SLEEP");
         lcd->updateLine(1, "");
         goToSleep();
         break;

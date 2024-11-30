@@ -1,5 +1,5 @@
-#ifndef __TEMP__
-#define __TEMP__
+#ifndef __TEMPSENSOR__
+#define __TEMPSENSOR__
 
 #include "Arduino.h"
 
