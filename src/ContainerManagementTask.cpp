@@ -5,11 +5,12 @@
 #include "string.h"
 
 
-ContainerManagementTask::ContainerManagementTask(Lcd* lcd, ServoMotor* door, Led* greenLed, Led* redLed) {
+ContainerManagementTask::ContainerManagementTask(Lcd* lcd, ServoMotor* door, Led* greenLed, Led* redLed, volatile bool* temperatureIsTooHigh) {
     this->lcd = lcd;
     this->door = door;
     this->greenLed = greenLed;
     this->redLed = redLed;
+    this->temperatureIsTooHigh = temperatureIsTooHigh;
 }
 
 void ContainerManagementTask::init(int period) {
@@ -48,10 +49,16 @@ void ContainerManagementTask::init(int period) {
 
 
 void ContainerManagementTask::tick() {
+    if (temperatureIsTooHigh) {
+        Serial.print(" true ");
+    } else {
+        Serial.print(" false ");
+    }
+
     unsigned long currentTime = millis();
     long distance = sonar->measureDistance();
     long fillingPercentage = (containerVolume + sonarDistanceFromContainer - distance) * 100 / containerVolume;
-    if (currentTime - lastDataSentTime >= 1000 && fillingPercentage >= prevFillingPercantage && fillingPercentage <= 100) {
+    if (currentTime - lastDataSentTime >= 500 && fillingPercentage >= prevFillingPercantage && fillingPercentage <= 100) {
         lastDataSentTime = currentTime;
         prevFillingPercantage = fillingPercentage;
         MsgService.sendVolume(fillingPercentage);
