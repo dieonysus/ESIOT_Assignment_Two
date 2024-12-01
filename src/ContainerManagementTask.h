@@ -30,10 +30,10 @@ class ContainerManagementTask: public Task {
         unsigned long timeBeforeSleep;
         unsigned long lastActivityTime;
         unsigned long timeDoorOpened;
-        unsigned long timeBeforeCloseDoor;      
+        unsigned long timeBeforeCloseDoor;     
+        unsigned long lastDataSentTime; 
         long containerVolume;
         long sonarDistanceFromContainer;  
-        long lastDataSentTime;
         long prevFillingPercantage;
 
         enum State {
