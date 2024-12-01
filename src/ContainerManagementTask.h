@@ -17,7 +17,6 @@ class ContainerManagementTask: public Task {
         ServoMotor* door;
         Led* greenLed;
         Led* redLed;
-        volatile bool* temperatureIsTooHigh;
 
         int pirPin;
         int buttonPin[2];
@@ -50,7 +49,7 @@ class ContainerManagementTask: public Task {
 
 
     public:
-        ContainerManagementTask(Lcd* lcd, ServoMotor* door, Led* greenLed, Led* redLed, volatile bool* temperatureIsTooHigh);
+        ContainerManagementTask(Lcd* lcd, ServoMotor* door, Led* greenLed, Led* redLed);
         void init(int period);
         void tick();
 
