@@ -14,10 +14,7 @@ void TemperatureMonitoringTask::init(int period) {
 }
 
 void TemperatureMonitoringTask::tick() {
-    redLed->switchOn();
-    delay(1000);
-    redLed->switchOff();
-    
+
     switch (state) {
 
     case NORMAL_TEMPERATURE:
