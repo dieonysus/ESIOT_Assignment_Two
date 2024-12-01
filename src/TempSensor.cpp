@@ -11,6 +11,6 @@ float TempSensor::readTemperature() {
     int sensorValue = analogRead(sensorPin);
     
     float voltage = sensorValue * (5.0 / 1023.0);  
-    float temperature = voltage * 100.0;          
+    float temperature = (voltage - 0.5) * 100.0;          
     return temperature;
 }
