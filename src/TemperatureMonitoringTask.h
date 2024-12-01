@@ -25,6 +25,7 @@ class TemperatureMonitoringTask : public Task {
         TempSensor* tempSensor;
 
         unsigned long lastDataSentTime;
+        float prevTemperature;
 
     public:
         TemperatureMonitoringTask(Lcd* lcd, ServoMotor* door, Led* greenLed, Led* redLed);

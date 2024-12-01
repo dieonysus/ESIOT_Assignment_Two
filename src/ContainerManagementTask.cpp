@@ -51,7 +51,7 @@ void ContainerManagementTask::tick() {
     unsigned long currentTime = millis();
     long distance = sonar->measureDistance();
     long fillingPercentage = (containerVolume + sonarDistanceFromContainer - distance) * 100 / containerVolume;
-    if (currentTime - lastDataSentTime >= 1000 && fillingPercentage >= prevFillingPercantage && fillingPercentage <= 100) {
+    if (currentTime - lastDataSentTime >= 500 && fillingPercentage >= prevFillingPercantage && fillingPercentage <= 100) {
         lastDataSentTime = currentTime;
         prevFillingPercantage = fillingPercentage;
         MsgService.sendVolume(fillingPercentage);

@@ -20,9 +20,10 @@ void setup() {
   temperatureMonitoringTask.init(1000);
   scheduler.init(100);
   scheduler.addTask(&containerManagementTask);
-  scheduler.addTask(&temperatureMonitoringTask);
+  //scheduler.addTask(&temperatureMonitoringTask);
 }
 
 void loop() {
   scheduler.schedule();
+  delay(1000);
 }
