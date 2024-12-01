@@ -3,6 +3,7 @@
 #include "MsgService.h"
 #include "Arduino.h"
 #include "string.h"
+#include "shared.h"
 
 
 ContainerManagementTask::ContainerManagementTask(Lcd* lcd, ServoMotor* door, Led* greenLed, Led* redLed) {
@@ -48,6 +49,9 @@ void ContainerManagementTask::init(int period) {
 
 
 void ContainerManagementTask::tick() {
+    if(temperatureIsTooHigh){
+      Serial.println("Temperature is too high"); 
+    }
     unsigned long currentTime = millis();
     long distance = sonar->measureDistance();
     long fillingPercentage = (containerVolume + sonarDistanceFromContainer - distance) * 100 / containerVolume;
@@ -137,6 +141,7 @@ void ContainerManagementTask::tick() {
         state = IDLE;
         break;
     }
+    
 }
 
 

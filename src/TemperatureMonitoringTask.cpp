@@ -1,4 +1,5 @@
 #include "TemperatureMonitoringTask.h"
+#include "shared.h"
 #include "MsgService.h"
 
 TemperatureMonitoringTask::TemperatureMonitoringTask(Lcd* lcd, ServoMotor* door, Led* greenLed, Led* redLed) {
