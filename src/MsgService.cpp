@@ -38,6 +38,11 @@ void MsgServiceClass::sendVolume(const long& msg){
   Serial.println("%");
 }
 
+void MsgServiceClass::sendTemp(const float& msg) {
+  Serial.print(msg);
+  Serial.println("°C");
+}
+
 void serialEvent() {
   /* reading the content */
   while (Serial.available()) {

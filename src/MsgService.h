@@ -39,6 +39,7 @@ public:
   
   void sendMsg(const String& msg);
   void sendVolume(const long& msg);
+  void sendTemp(const float& msg);
 };
 
 extern MsgServiceClass MsgService;

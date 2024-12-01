@@ -101,11 +101,12 @@ public class Dashboard extends Application {
                     String newPercent = percentTextField.getText();
                     String newTemp = tempTextField.getText();
                     String msg = channel.receiveMsg();
+                    System.out.println(msg);
 
                     if (msg.endsWith("%")) {
                         newPercent = msg;
                     }
-                    if (msg.startsWith("°C")) {
+                    if (msg.endsWith("°C")) {
                         newTemp = msg;
                     }
 
