@@ -3,6 +3,7 @@
 #include "shared.h"
 
 #define TEMP_SENSOR_PIN A0
+#define TEMP_TELEMETRY_INTERVAL 500
 
 TemperatureMonitoringTask::TemperatureMonitoringTask(Lcd* lcd, ServoMotor* door, Led* greenLed, Led* redLed) {
     this->lcd = lcd;
@@ -26,7 +27,7 @@ void TemperatureMonitoringTask::tick() {
 
     unsigned long currentTime = millis();
     float currentTemp = tempSensor->readTemperature();
-    if (currentTime - lastDataSentTime >= 500) {
+    if (currentTime - lastDataSentTime >= TEMP_TELEMETRY_INTERVAL) {
         lastDataSentTime = currentTime;
         prevTemperature = currentTemp;
         MsgService.sendTemp(currentTemp);
