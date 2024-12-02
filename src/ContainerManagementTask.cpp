@@ -10,6 +10,7 @@
 #define CLOSE_BUTTON_PIN 13
 #define TRIG_PIN 4
 #define ECHO_PIN 5
+#define FILLING_PERCENTAGE_SEND_INTERVAL 500
 
 ContainerManagementTask::ContainerManagementTask(Lcd* lcd, ServoMotor* door, Led* greenLed, Led* redLed) {
     this->lcd = lcd;
@@ -37,6 +38,7 @@ void ContainerManagementTask::init(int period) {
 
     timeBeforeCloseDoor = 5000;
     timeDoorOpened = 0;
+
     lastDataSentTime = 0;
 
     containerVolume = 20;
@@ -56,6 +58,7 @@ void ContainerManagementTask::tick() {
         lastActivityTime = currentTime;
         return;
     }
+
     long distance = sonar->measureDistance();
     long fillingPercentage = (containerVolume + sonarDistanceFromContainer - distance) * 100 / containerVolume;
     if (currentTime - lastDataSentTime >= 500 && fillingPercentage >= prevFillingPercantage && fillingPercentage <= 100) {
@@ -162,3 +165,6 @@ void ContainerManagementTask::wakeUp(){
 }
 
 // TODO: doesnt become full from processing_waste state
+// FILLING_PERCENTAGE_SENT_INTERVAL
+// going to idle after recieving waste arrow add to FSM
+// delete messages
