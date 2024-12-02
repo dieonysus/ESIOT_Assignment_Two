@@ -11,8 +11,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.util.Random;
-
 public class Dashboard extends Application {
 
     @Override
@@ -103,13 +101,12 @@ public class Dashboard extends Application {
 
                     if (msg.endsWith("%")) {
                         newPercent = msg;
+                        Logger.logPercentage(newPercent);
                     }
                     if (msg.endsWith("°C")) {
                         newTemp = msg;
+                        Logger.logTemperature(newTemp);
                     }
-
-                    Logger.logPercentage(newPercent);
-                    Logger.logTemperature(newTemp);
 
                     final String percentage = newPercent;
                     final String temperature = newTemp;
@@ -129,9 +126,11 @@ public class Dashboard extends Application {
 
         primaryStage.show();
         vBox.requestFocus();
+
     }
 
     public static void main(String[] args) {
+        Runtime.getRuntime().addShutdownHook(new Thread(Logger::close));
         launch(args);
     }
 }
