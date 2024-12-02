@@ -80,6 +80,4 @@ public class SerialMonitor implements SerialPortEventListener {
             }
         }
     }
-
-
 }

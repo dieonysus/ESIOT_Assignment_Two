@@ -26,7 +26,7 @@ void setup() {
   containerManagementTask.init(100);
   temperatureMonitoringTask.init(100);
   scheduler.addTask(&containerManagementTask);
-  //scheduler.addTask(&temperatureMonitoringTask);
+  scheduler.addTask(&temperatureMonitoringTask);
   temperatureIsTooHigh = false;
 }
 
