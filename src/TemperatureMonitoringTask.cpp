@@ -1,6 +1,8 @@
 #include "TemperatureMonitoringTask.h"
-#include "shared.h"
 #include "MsgService.h"
+#include "shared.h"
+
+#define TEMP_SENSOR_PIN A0
 
 TemperatureMonitoringTask::TemperatureMonitoringTask(Lcd* lcd, ServoMotor* door, Led* greenLed, Led* redLed) {
     this->lcd = lcd;
@@ -11,13 +13,17 @@ TemperatureMonitoringTask::TemperatureMonitoringTask(Lcd* lcd, ServoMotor* door,
 
 void TemperatureMonitoringTask::init(int period) {
     Task::init(period);
-    state = NORMAL_TEMPERATURE;
-    tempSensor = new TempSensor(A0);
+
+    tempSensor = new TempSensor(TEMP_SENSOR_PIN);
     tempSensor->init();
+
     lastDataSentTime = 0;
+
+    state = NORMAL_TEMPERATURE;
 }
 
 void TemperatureMonitoringTask::tick() {
+
     unsigned long currentTime = millis();
     float currentTemp = tempSensor->readTemperature();
     if (currentTime - lastDataSentTime >= 500) {
@@ -29,8 +35,9 @@ void TemperatureMonitoringTask::tick() {
 
     switch (state) {
     case NORMAL_TEMPERATURE:
-        if (prevTemperature > 29.0) {
+        if (prevTemperature > 30.0) {
             door->close();
+            temperatureIsTooHigh = true;
             state = TEMPERATURE_PROBLEM;
         }
         break;
@@ -52,6 +59,7 @@ void TemperatureMonitoringTask::tick() {
     case RESTORING:
         redLed->switchOff();
         greenLed->switchOn();
+        temperatureIsTooHigh = false;
         state = NORMAL_TEMPERATURE;
         break;
     }
