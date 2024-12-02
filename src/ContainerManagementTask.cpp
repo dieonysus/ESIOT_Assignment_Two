@@ -5,6 +5,11 @@
 #include "string.h"
 #include "shared.h"
 
+#define PIR_PIN 2
+#define OPEN_BUTTON_PIN 12
+#define CLOSE_BUTTON_PIN 13
+#define TRIG_PIN 4
+#define ECHO_PIN 5
 
 ContainerManagementTask::ContainerManagementTask(Lcd* lcd, ServoMotor* door, Led* greenLed, Led* redLed) {
     this->lcd = lcd;
@@ -15,33 +20,30 @@ ContainerManagementTask::ContainerManagementTask(Lcd* lcd, ServoMotor* door, Led
 
 void ContainerManagementTask::init(int period) {
     Task::init(period);
-    pirPin = 2;
-    buttonPin[0] = 12;
-    buttonPin[1] = 13;
-    trigPin = 4; 
-    echoPin = 5;
 
-    openButton = new Button(buttonPin[0]);
-    closeButton = new Button(buttonPin[1]);
+    openButton = new Button(OPEN_BUTTON_PIN);
+    closeButton = new Button(CLOSE_BUTTON_PIN);
 
-    sonar = new Sonar(trigPin, echoPin); 
+    sonar = new Sonar(TRIG_PIN, ECHO_PIN); 
     sonar->initSonar();                 
 
-    pinMode(pirPin, INPUT_PULLUP);
-    enableInterrupt(pirPin, wakeUp, RISING);
+    pinMode(PIR_PIN, INPUT_PULLUP);
+    enableInterrupt(PIR_PIN, wakeUp, RISING);
 
     MsgService.init();
 
-    timeBeforeSleep = 10000;
+    timeBeforeSleep = 20000;
     lastActivityTime = 0;
+
     timeBeforeCloseDoor = 5000;
     timeDoorOpened = 0;
     lastDataSentTime = 0;
-    state = IDLE;
 
     containerVolume = 20;
     sonarDistanceFromContainer = 5;
     prevFillingPercantage = 0;
+
+    state = IDLE;
     stateAfterWakeUp = IDLE;
 
     door->close();
@@ -49,10 +51,11 @@ void ContainerManagementTask::init(int period) {
 
 
 void ContainerManagementTask::tick() {
-    if(temperatureIsTooHigh){
-      Serial.println("Temperature is too high"); 
-    }
     unsigned long currentTime = millis();
+    if (temperatureIsTooHigh) {
+        lastActivityTime = currentTime;
+        return;
+    }
     long distance = sonar->measureDistance();
     long fillingPercentage = (containerVolume + sonarDistanceFromContainer - distance) * 100 / containerVolume;
     if (currentTime - lastDataSentTime >= 500 && fillingPercentage >= prevFillingPercantage && fillingPercentage <= 100) {
@@ -113,8 +116,7 @@ void ContainerManagementTask::tick() {
         break;
 
     case CONTAINER_FULL:
-        //LCD: CONTAINER FULL
-        lcd->updateLine(0, "Container Full");
+        lcd->updateLine(0, "CONTAINER FULL");
         lcd->updateLine(1, "");
         greenLed->switchOff();
         redLed->switchOn();
@@ -160,5 +162,3 @@ void ContainerManagementTask::wakeUp(){
 }
 
 // TODO: doesnt become full from processing_waste state
-// door doesnt move 90
-

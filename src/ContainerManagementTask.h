@@ -18,11 +18,6 @@ class ContainerManagementTask: public Task {
         Led* greenLed;
         Led* redLed;
 
-        int pirPin;
-        int buttonPin[2];
-        int echoPin;
-        int trigPin;
-
         Button* openButton;
         Button* closeButton;
         Sonar* sonar;
