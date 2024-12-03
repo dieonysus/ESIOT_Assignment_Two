@@ -168,3 +168,4 @@ void ContainerManagementTask::wakeUp(){
 // FILLING_PERCENTAGE_SENT_INTERVAL
 // going to idle after recieving waste arrow add to FSM
 // delete messages
+// add wire to tmp sensor
