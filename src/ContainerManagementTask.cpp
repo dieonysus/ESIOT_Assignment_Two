@@ -166,5 +166,4 @@ void ContainerManagementTask::wakeUp(){
 
 // TODO: doesnt become full from processing_waste state
 // FILLING_PERCENTAGE_SENT_INTERVAL
-// going to idle after recieving waste arrow add to FSM
 // delete messages
